@@ -7,6 +7,7 @@ from game.room import Room
 from game.player import Player
 from game.object import GameObject
 from game.npc import NPC
+from .name_generator import generate_name
 
 
 class ContentEventHandler(FileSystemEventHandler):
@@ -59,7 +60,7 @@ class Game:
                 obj = getattr(module, 'obj', None)
                 if obj:
                     self.objects.append(obj)
-                    room_name = obj.location.lower()
+                    room_name = obj.location and obj.location.lower()
                     if room_name in self.rooms:
                         obj.location = self.rooms[room_name]
 
@@ -75,9 +76,11 @@ class Game:
                     room_name = npc.location.lower()
                     if room_name in self.rooms:
                         npc.location = self.rooms[room_name]
+                    npc.game = self
 
     def add_player(self, sid):
-        self.players[sid] = Player(sid, self.rooms['start room'])
+        name = generate_name()
+        self.players[sid] = Player(sid, name, self.rooms['start room'])
         return self.players[sid].current_room.get_full_description(self.players, self.objects, self.npcs)
 
     def remove_player(self, sid):

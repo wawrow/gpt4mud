@@ -1,8 +1,17 @@
 class Room:
-    def __init__(self, name, description, connections):
+    def __init__(self, name, description, connections={}):
         self.name = name
         self.description = description
         self.connections = connections
+
+    def add_exit(self, direction, target_room_id):
+        """
+        Adds an exit to the room.
+
+        :param direction: A string representing the direction of the exit (e.g. "north").
+        :param target_room_id: The ID of the room that the exit leads to.
+        """
+        self.connections[direction] = target_room_id
 
     def get_description(self):
         return self.description
