@@ -11,24 +11,27 @@ class Room:
         return self.connections
 
     def get_full_description(self, players, objects, npcs):
-        description = self.get_description()
+        description = f"{self.name}\n{self.description}\n"
+        
+        exits = ', '.join([direction.capitalize() for direction, room_name in self.connections.items() if room_name])
+        description += f"Exits: {exits}\n"
 
-        exits = ', '.join(self.connections.keys())
-        description += f'\nExits: {exits}'
-
-        items = [obj for obj in objects if obj.location == self]
-        if items:
-            items_str = ', '.join([item.name for item in items])
-            description += f'\nItems: {items_str}'
+        room_objects = [obj for obj in objects if obj.location == self]
+        if room_objects:
+            description += "Objects:\n"
+            for obj in room_objects:
+                description += f"  - {obj.name}\n"
 
         room_npcs = [npc for npc in npcs if npc.location == self]
         if room_npcs:
-            npcs_str = ', '.join([npc.name for npc in room_npcs])
-            description += f'\nNPCs: {npcs_str}'
+            description += "NPCs:\n"
+            for npc in room_npcs:
+                description += f"  - {npc.name}\n"
 
         room_players = [player for player in players.values() if player.current_room == self]
         if room_players:
-            players_str = ', '.join([player.name for player in room_players])
-            description += f'\nPlayers: {players_str}'
+            description += "Players:\n"
+            for player in room_players:
+                description += f"  - {player.name}\n"
 
-        return description
+        return description.strip()
