@@ -3,8 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>Text Game Engine</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('response', (response) => {
+            const output = document.getElementById('output');
+            output.innerHTML += response + '<br>';
+        });
+
+        function sendCommand() {
+            const input = document.getElementById('input');
+            socket.emit('command', input.value);
+            input.value = '';
+        }
+    </script>
 </head>
 <body>
     <h1>Welcome to the Text Game Engine</h1>
+    <div id="output"></div>
+    <input id="input" type="text">
+    <button onclick="sendCommand()">Send</button>
 </body>
 </html>

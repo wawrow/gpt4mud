@@ -7,6 +7,5 @@ class NPC:
     def get_description(self):
         return self.description
 
-    def interact(self, player):
-        # Interaction between player and NPC
-        pass
+    def interact(self):
+        return "Hello, I'm just a friendly NPC!"
