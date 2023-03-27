@@ -1,5 +1,4 @@
-import hupper
-import webapp.app
+from webapp.app import app, socketio
 
 if __name__ == '__main__':
-    hupper.start_reloader('webapp.app.run_server')
+    socketio.run(app, debug=True)
