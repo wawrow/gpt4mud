@@ -5,4 +5,4 @@ room = Room(
     description="You step into a small shop filled with various items and trinkets for sale."
 )
 
-room.add_exit("west", "town_square")
+room.add_exit("west", "town square")

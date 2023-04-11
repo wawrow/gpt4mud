@@ -5,4 +5,4 @@ room = Room(
     description="You arrive at the blacksmith's workshop. The sound of metal striking metal fills the air as the blacksmith works on a new piece of equipment."
 )
 
-room.add_exit("north", "town_square")
+room.add_exit("north", "town square")

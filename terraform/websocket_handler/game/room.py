@@ -1,8 +1,8 @@
 class Room:
-    def __init__(self, name, description, connections={}):
+    def __init__(self, name, description, connections=None):
         self.name = name
         self.description = description
-        self.connections = connections
+        self.connections = {} if connections is None else connections
 
     def add_exit(self, direction, target_room_id):
         """
@@ -44,3 +44,21 @@ class Room:
                 description += f"  - {player.name}\n"
 
         return description.strip()
+
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "description": self.description,
+            "connections": {direction: room.lower() if isinstance(room, str) else room.name.lower() for direction, room in self.connections.items()},
+        }
+
+    @classmethod
+    def from_dict(cls, data, game):
+        room = cls(data["name"], data["description"])
+
+        # Rebuild room connections
+        for direction, connected_room_id in data["connections"].items():
+            connected_room = game.rooms[connected_room_id]
+            room.add_exit(direction, connected_room)
+
+        return room

@@ -1,2 +1,10 @@
 .venv
 cleanup.py
+*_build
+.terraform
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.backup
+*.tfvars

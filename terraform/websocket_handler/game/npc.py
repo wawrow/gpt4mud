@@ -21,6 +21,21 @@ class NPC:
         self.quests.append(quest)
         quest.npc = self
         quest.game = self.game
+    
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'description': self.description,
+            'location': self.location,
+            'quests': [quest.name for quest in self.quests],
+        }
+    
+    @classmethod
+    def from_dict(cls, data, game):
+        npc = cls(data['name'], data['description'], None, game)
+        # if 'quests' in data:
+        #     npc.quests = [game.quests[name] for name in data['quests']]
+        return npc
 
 class Quest:
     def __init__(self, name, description, steps, rewards, complete=False):

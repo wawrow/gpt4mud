@@ -1,7 +1,7 @@
 import os
 import importlib
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+# from watchdog.observers import Observer
+# from watchdog.events import FileSystemEventHandler
 
 from game.room import Room
 from game.player import Player
@@ -10,14 +10,14 @@ from game.npc import NPC
 from .name_generator import generate_name
 
 
-class ContentEventHandler(FileSystemEventHandler):
-    def __init__(self, game):
-        self.game = game
+# class ContentEventHandler(FileSystemEventHandler):
+#     def __init__(self, game):
+#         self.game = game
 
-    def on_modified(self, event):
-        if event.src_path.endswith('.py'):
-            print(f'Reloading content: {event.src_path}')
-            self.game.load_content()
+#     def on_modified(self, event):
+#         if event.src_path.endswith('.py'):
+#             print(f'Reloading content: {event.src_path}')
+#             self.game.load_content()
 
 
 class Game:
@@ -28,18 +28,18 @@ class Game:
         self.players = {}
 
         self.load_content()
-        self.start_watching_content()
+        # self.start_watching_content()
 
     def load_content(self):
         self.load_rooms()
         self.load_objects()
         self.load_npcs()
 
-    def start_watching_content(self):
-        event_handler = ContentEventHandler(self)
-        observer = Observer()
-        observer.schedule(event_handler, 'content', recursive=True)
-        observer.start()
+    # def start_watching_content(self):
+    #     event_handler = ContentEventHandler(self)
+    #     observer = Observer()
+    #     observer.schedule(event_handler, 'content', recursive=True)
+    #     observer.start()
 
     def load_rooms(self):
         rooms_path = 'content/rooms'
@@ -60,9 +60,9 @@ class Game:
                 obj = getattr(module, 'obj', None)
                 if obj:
                     self.objects.append(obj)
-                    room_name = obj.location and obj.location.lower()
-                    if room_name in self.rooms:
-                        obj.location = self.rooms[room_name]
+                    # room_name = obj.location and obj.location.lower()
+                    # if room_name in self.rooms:
+                    #     obj.location = self.rooms[room_name]
 
     def load_npcs(self):
         npcs_path = 'content/npcs'
@@ -73,14 +73,14 @@ class Game:
                 npc = getattr(module, 'npc', None)
                 if npc:
                     self.npcs.append(npc)
-                    room_name = npc.location.lower()
-                    if room_name in self.rooms:
-                        npc.location = self.rooms[room_name]
+                    # room_name = npc.location.lower()
+                    # if room_name in self.rooms:
+                    #     npc.location = self.rooms[room_name]
                     npc.game = self
 
     def add_player(self, sid):
         name = generate_name()
-        self.players[sid] = Player(sid, name, self.rooms['start room'])
+        self.players[sid] = Player(sid, name, self.rooms['town square'])
         return self.players[sid].current_room.get_full_description(self.players, self.objects, self.npcs)
 
     def remove_player(self, sid):
@@ -111,3 +111,22 @@ class Game:
                 return f"You can't find {npc_name} here."
         else:
             return 'Invalid command.'
+
+    def to_dict(self):
+        return {
+            "players": {player_id: player.to_dict() for player_id, player in self.players.items()},
+            "rooms": {room_id: room.to_dict() for room_id, room in self.rooms.items()},
+            "objects": [obj.to_dict() for obj in self.objects],
+            "npcs": [npc.to_dict() for npc in self.npcs],
+            # Serialize any other attributes you need
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        game = cls()
+        game.rooms = {room_id: Room.from_dict(room_data, game) for room_id, room_data in data["rooms"].items()}
+        game.objects = [GameObject.from_dict(obj_data) for obj_data in data["objects"]]
+        game.players = {player_id: Player.from_dict(player_data, game) for player_id, player_data in data["players"].items()}
+        game.npcs = [NPC.from_dict(npc_data, game) for npc_data in data["npcs"]]
+        # Deserialize any other attributes you need
+        return game

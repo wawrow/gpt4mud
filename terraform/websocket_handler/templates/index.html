@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-based RPG</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <style>
+        body {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+            background-color: #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: #fff;
+            border: 2px solid #333;
+            padding: 1rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        h1 {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        textarea {
+            width: 100%;
+            height: 300px;
+            font-family: "Courier New", Courier, monospace;
+            margin-bottom: 1rem;
+            resize: none;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 0.5rem;
+            font-family: "Courier New", Courier, monospace;
+        }
+        #commands {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            border: 1px solid #000;
+            padding: 10px;
+            font-size: 12px;
+            line-height: 1.5;
+            font-family: "Courier New", Courier, monospace;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+<body>
+    <div id="commands">
+        <strong>Commands:</strong><br>
+        look<br>
+        north<br>
+        west<br>
+        south<br>
+        east
+    </div>
+    <div class="container">
+        <h1>Text-based RPG</h1>
+        <textarea id="game-output" readonly></textarea>
+        <input type="text" id="game-input" placeholder="Enter your command">
+    </div>
+    <script>
+        const gameOutput = document.getElementById('game-output');
+        const gameInput = document.getElementById('game-input');
+
+        const webSocketUrl = '{{wss_url}}'; 
+        const webSocket = new WebSocket(webSocketUrl);
+
+        webSocket.onopen = (event) => {
+            console.log('WebSocket connection opened:', event);
+            webSocket.send("look");
+        };
+
+        webSocket.onmessage = (event) => {
+            console.log('WebSocket message received:', event.data);
+            gameOutput.value += event.data + '\n';
+        };
+
+        webSocket.onclose = (event) => {
+            console.log('WebSocket connection closed:', event);
+        };
+
+        webSocket.onerror = (event) => {
+            console.error('WebSocket error:', event);
+        };
+
+        gameInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const message = gameInput.value.trim();
+                if (message) {
+                    webSocket.send(message);
+                    gameInput.value = '';
+                }
+            }
+        });
+
+        gameInput.focus();
+    </script>
+</body>
+</html>

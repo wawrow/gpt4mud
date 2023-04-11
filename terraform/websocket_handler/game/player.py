@@ -1,3 +1,6 @@
+from game.object import GameObject
+
+
 class Player:
     def __init__(self, sid, name, current_room):
         self.sid = sid
@@ -7,7 +10,7 @@ class Player:
 
     def move(self, direction, rooms):
         if direction in self.current_room.connections:
-            self.current_room = rooms[self.current_room.connections[direction]]
+            self.current_room = self.current_room.connections[direction]
             return self.current_room.get_description()
         else:
             return "You can't go that way."
@@ -24,3 +27,18 @@ class Player:
             return f'You picked up {obj.name}.'
         else:
             return "You can't find that object here."
+        
+    def to_dict(self):
+        return {
+            'sid': self.sid,
+            'name': self.name,
+            'current_room': self.current_room.name.lower(),
+            'inventory': [obj.name for obj in self.inventory]
+        }
+    
+    @classmethod
+    def from_dict(cls, data, game):
+        player = cls(data['sid'], data['name'], game.rooms[data['current_room'].lower()])
+        player.inventory = [GameObject(name) for name in data['inventory']]
+        return player
+    
